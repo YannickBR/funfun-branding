@@ -1,32 +1,35 @@
-<div id="carousel" class="carousel"></div>
+<div id="carousel-sidebar" class="carousel-sidebar"></div>
 
 <style>
-    .carousel {
+    .carousel-sidebar {
         position: relative;
-        width: 600px;
+        width: 10.5rem;
+        margin-left: auto;
+        margin-right: auto;
         /* Set to desired width */
-        height: 400px;
+        height: 10.5rem;
+        border-radius: 6px;
         /* Set to desired height */
         overflow: hidden;
     }
 
-    .carousel a {
+    .carousel-sidebar a {
         position: absolute;
-        top: 0;
-        left: 0;
+        top: 1rem;
+        left: 1rem;
         width: 100%;
         height: 100%;
         opacity: 0;
-        transition: opacity 2s ease-in-out;
+        transition: opacity 1s ease-in-out;
     }
 
-    .carousel a.active {
+    .carousel-sidebar a.active {
         opacity: 1;
     }
 </style>
 
 <script>
-    let sponsorLinks = {};
+    let sponsorLinksSidebar = {};
 
     // Fetch the sponsor_links.json file
     fetch('https://corsogroepfunfun.nl/wp-json/custom/v1/sponsor-links')
@@ -39,8 +42,7 @@
                 }
             }
 
-            sponsorLinks = data;
-            console.log(sponsorLinks);
+            sponsorLinksSidebar = data;
         })
         .then(() => {
             fetch('https://corsogroepfunfun.nl/wp-json/custom/v1/sponsors-files/')
@@ -52,14 +54,13 @@
                     data.forEach(file => {
                         // Check if it's an image file, you can add more extensions if needed
                         let img = new Image();
-                        let div = document.createElement("div");
                         let a = document.createElement("a");
 
                         // Get the filename without extension
                         let filename = file.name.split('.').slice(0, -1).join('.');
 
                         // Set the href to the corresponding value from sponsor_links.json
-                        let link = sponsorLinks[filename];
+                        let link = sponsorLinksSidebar[filename];
 
                         if (link) {
                             a.href = link;
@@ -69,17 +70,30 @@
                         img.src = decodeURI(file.url); // Use the direct link to the image
                         img.style.width = "8.5rem"; // Set the width of the image
                         img.style.height = "8.5rem"; // Maintain the aspect ratio
-                        div.style.margin = "4px"; // Add some padding
-                        div.style.borderRadius = "3%"; // Make it round
-                        div.style.padding = "15px"; // Add some padding
-                        div.style.backgroundColor = "#ffffff"; // Add a white background
-                        div.style.boxShadow = "0 3px 5px -1px rgba(0,0,0,.2),0 5px 8px 0 rgba(0,0,0,.14),0 1px 14px 0 rgba(0,0,0,.12)"; // Add a shadow
-                        div.style.display = "inline-block"; // Make it inline
 
                         a.appendChild(img); // Append the image to the anchor tag
-                        div.appendChild(a); // Append the anchor tag to the div
-                        document.getElementById("sponsors").appendChild(div); // Append to body or any other element
+                        document.getElementById("carousel-sidebar").appendChild(a); // Append to body or any other element
                     });
-                });
+                })
+                .then(() => {
+                    const links = document.querySelectorAll('#carousel-sidebar a');
+                    let current = 0;
+
+                    // Initially set the first image as active
+                    if (links.length > 0) {
+                        links[current].classList.add('active');
+                    }
+
+                    setInterval(() => {
+                        // Remove 'active' class from current image
+                        links[current].classList.remove('active');
+
+                        // Move to the next image, loop back to the start if at the end
+                        current = (current + 1) % links.length;
+
+                        // Add 'active' class to new current image
+                        links[current].classList.add('active');
+                    }, 1500); // Change image every 4 seconds
+                })
         });
 </script>

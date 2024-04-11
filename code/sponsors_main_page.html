@@ -17,13 +17,11 @@
             }
 
             sponsorLinks = data;
-            console.log(sponsorLinks);
         })
         .then(() => {
             fetch('https://corsogroepfunfun.nl/wp-json/custom/v1/sponsors-files/')
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data)
                     const images = data
                         .sort(() => 0.5 - Math.random()); // Randomize the array
 
@@ -49,7 +47,6 @@
                     // Set the CSS variable for the number of images
                     document.documentElement.style.setProperty('--num-images', images.length);
                     document.documentElement.style.setProperty('--screen-width', window.maxWidth);
-                    console.log(window.innerWidth)
                     // Duplicate images for continuous animation
                     const carouselContent = carouselInner.innerHTML;
                     carouselInner.innerHTML += carouselContent;
@@ -72,20 +69,25 @@
     }
 
     .carousel img {
-        height: 7rem;
-        min-width: 7rem;
-        margin-left: 1rem;
-        margin-right: 1rem;
+        height: 110px;
+        min-width: 110px;
         object-fit: cover;
         /* This ensures images cover the area nicely */
         flex-shrink: 0;
         /* Spacing between images */
     }
 
+    .carousel a {
+        height: 110px;
+        margin-left: 1rem;
+        margin-right: 1rem;
+        width: 110px;
+    }
+
     @media (max-width: 600px) {
         .carousel img {
-            height: 3rem;
-            min-width: 3rem;
+            height: 60px;
+            min-width: 60px;
         }
 
         .carousel-wrapper {
@@ -114,11 +116,12 @@
 
     .carousel-inner {
         display: flex;
-        animation: scroll 30s linear infinite;
+        animation: scroll 40s linear infinite;
     }
 
 
     .carousel img:hover {
         transform: scale(1.05);
+        transition: transform 0.5s;
     }
 </style>
