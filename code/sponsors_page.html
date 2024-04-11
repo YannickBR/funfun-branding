@@ -1,0 +1,59 @@
+<div id="sponsors"></div>
+<script>
+    let sponsorLinks = {};
+
+    // Fetch the sponsor_links.json file
+    fetch('https://corsogroepfunfun.nl/wp-json/custom/v1/sponsor-links')
+        .then(response => response.json())
+        .then(data => {
+            // Decode the URLs
+            for (let key in data) {
+                if (data.hasOwnProperty(key)) {
+                    data[key] = decodeURIComponent(data[key]);
+                }
+            }
+
+            sponsorLinks = data;
+            console.log(sponsorLinks);
+        })
+        .then(() => {
+            fetch('https://corsogroepfunfun.nl/wp-json/custom/v1/sponsors-files/')
+                .then(response => response.json())
+                .then(data => {
+                    // Shuffle the data array
+                    data.sort(() => Math.random() - 0.5);
+
+                    data.forEach(file => {
+                        // Check if it's an image file, you can add more extensions if needed
+                        let img = new Image();
+                        let div = document.createElement("div");
+                        let a = document.createElement("a");
+
+                        // Get the filename without extension
+                        let filename = file.name.split('.').slice(0, -1).join('.');
+
+                        // Set the href to the corresponding value from sponsor_links.json
+                        let link = sponsorLinks[filename];
+
+                        if (link) {
+                            a.href = link;
+                            // open in new tab
+                            a.target = "_blank";
+                        }
+                        img.src = decodeURI(file.url); // Use the direct link to the image
+                        img.style.width = "8.5rem"; // Set the width of the image
+                        img.style.height = "8.5rem"; // Maintain the aspect ratio
+                        div.style.margin = "4px"; // Add some padding
+                        div.style.borderRadius = "3%"; // Make it round
+                        div.style.padding = "15px"; // Add some padding
+                        div.style.backgroundColor = "#ffffff"; // Add a white background
+                        div.style.boxShadow = "0 3px 5px -1px rgba(0,0,0,.2),0 5px 8px 0 rgba(0,0,0,.14),0 1px 14px 0 rgba(0,0,0,.12)"; // Add a shadow
+                        div.style.display = "inline-block"; // Make it inline
+
+                        a.appendChild(img); // Append the image to the anchor tag
+                        div.appendChild(a); // Append the anchor tag to the div
+                        document.getElementById("sponsors").appendChild(div); // Append to body or any other element
+                    });
+                });
+        });
+</script>

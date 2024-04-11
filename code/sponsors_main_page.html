@@ -1,0 +1,124 @@
+<div class="carousel-wrapper">
+    <div id="carousel" class="carousel">
+        <!-- Images will be inserted here by JavaScript -->
+    </div>
+</div>
+
+
+<script>
+    fetch('https://corsogroepfunfun.nl/wp-json/custom/v1/sponsor-links')
+        .then(response => response.json())
+        .then(data => {
+            // Decode the URLs
+            for (let key in data) {
+                if (data.hasOwnProperty(key)) {
+                    data[key] = decodeURIComponent(data[key]);
+                }
+            }
+
+            sponsorLinks = data;
+            console.log(sponsorLinks);
+        })
+        .then(() => {
+            fetch('https://corsogroepfunfun.nl/wp-json/custom/v1/sponsors-files/')
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data)
+                    const images = data
+                        .sort(() => 0.5 - Math.random()); // Randomize the array
+
+                    const carouselInner = document.createElement('div');
+                    carouselInner.className = 'carousel-inner';
+                    document.getElementById('carousel').appendChild(carouselInner);
+                    images.forEach(image => {
+                        let a = document.createElement("a");
+                        let filename = image.name.split('.').slice(0, -1).join('.');
+                        let link = sponsorLinks[filename];
+                        if (link) {
+                            a.href = link;
+                        }
+                        a.target = "_blank";
+
+                        const img = document.createElement('img');
+                        img.src = image.url;
+
+                        a.appendChild(img);
+                        carouselInner.appendChild(a);
+                    });
+
+                    // Set the CSS variable for the number of images
+                    document.documentElement.style.setProperty('--num-images', images.length);
+                    document.documentElement.style.setProperty('--screen-width', window.maxWidth);
+                    console.log(window.innerWidth)
+                    // Duplicate images for continuous animation
+                    const carouselContent = carouselInner.innerHTML;
+                    carouselInner.innerHTML += carouselContent;
+                })
+                .catch(error => console.error('Failed to load images:', error));
+        });
+</script>
+<style>
+    /* mobile */
+    .carousel-wrapper {
+        padding: 20px;
+        max-width: 100vw;
+        margin-left: 2%;
+        margin-right: 2%;
+        margin-top: 2%;
+        margin-bottom: 55px;
+        border-radius: 6px;
+        background-color: white;
+        box-shadow: 0 3px 5px -1px rgba(0, 0, 0, .2), 0 5px 8px 0 rgba(0, 0, 0, .14), 0 1px 14px 0 rgba(0, 0, 0, .12);
+    }
+
+    .carousel img {
+        height: 7rem;
+        min-width: 7rem;
+        margin-left: 1rem;
+        margin-right: 1rem;
+        object-fit: cover;
+        /* This ensures images cover the area nicely */
+        flex-shrink: 0;
+        /* Spacing between images */
+    }
+
+    @media (max-width: 600px) {
+        .carousel img {
+            height: 3rem;
+            min-width: 3rem;
+        }
+
+        .carousel-wrapper {
+            padding: 10px;
+            margin: 10px;
+            margin-bottom: 55px;
+        }
+    }
+
+    .carousel {
+        display: flex;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    @keyframes scroll {
+        0% {
+            transform: translateX(0);
+        }
+
+        100% {
+            /* Now it moves only by the total width of the original set of images */
+            transform: translateX(calc(-9rem * var(--num-images)));
+        }
+    }
+
+    .carousel-inner {
+        display: flex;
+        animation: scroll 30s linear infinite;
+    }
+
+
+    .carousel img:hover {
+        transform: scale(1.05);
+    }
+</style>
